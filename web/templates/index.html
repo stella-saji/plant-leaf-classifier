@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🌿 Plant Leaf Classifier</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            font-family: "Segoe UI", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            width: 420px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2e7d32;
+            margin-bottom: 20px;
+        }
+
+        .upload-box {
+            border: 2px dashed #81c784;
+            padding: 20px;
+            text-align: center;
+            border-radius: 12px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .upload-box:hover {
+            background: #f1f8e9;
+            border-color: #4caf50;
+        }
+
+        input[type="file"] {
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            background: #4caf50;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+
+        button:hover {
+            background: #43a047;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #f9fbe7;
+            animation: slideUp 0.5s ease;
+        }
+
+        .confidence {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        ul {
+            padding-left: 18px;
+        }
+
+        img {
+            margin-top: 15px;
+            width: 100%;
+            border-radius: 12px;
+            transition: transform 0.3s;
+        }
+
+        img:hover {
+            transform: scale(1.03);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🌿 Plant Leaf Classifier</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="upload-box">
+            <p>📸 Upload a leaf image</p>
+            <input type="file" name="image" required>
+        </div>
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction %}
+        <div class="result">
+            <p><strong>Prediction:</strong> {{ prediction }}</p>
+
+            {% if confidence %}
+                <p class="confidence">
+                    Confidence: {{ (confidence * 100) | round(2) }}%
+                </p>
+            {% endif %}
+
+            {% if uses %}
+                <h4>💊 Uses</h4>
+                <ul>
+                    {% for use in uses %}
+                        <li>{{ use }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if image_name %}
+                <img src="{{ url_for('static', filename='uploads/' + image_name) }}">
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>
