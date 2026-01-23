@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing import image
+import os
+CONFIDENCE_THRESHOLD = 0.7  # 70%
 
 # 1. Load the trained model
 model = tf.keras.models.load_model("plant_leaf_model.h5")
@@ -45,15 +47,36 @@ plant_info = {
     }
 }
 
-predictions = model.predict(img_array)
-confidence = np.max(predictions)
-predicted_class = class_names[np.argmax(predictions)]
+test_dir = "test_images"
+image_files = [f for f in os.listdir(test_dir) if f.lower().endswith(('.jpg', '.png', '.jpeg'))]
+
+if not image_files:
+    raise FileNotFoundError("❌ No images found in test_images folder")
+
+for img_name in image_files:
+    img_path = os.path.join(test_dir, img_name)
+
+    img = image.load_img(img_path, target_size=(224, 224))
+    img_array = image.img_to_array(img)
+    img_array = img_array / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
+
+    predictions = model.predict(img_array)
+    confidence = np.max(predictions)
+    predicted_class = class_names[np.argmax(predictions)]
+
+    
 
 # 5. Output result
-print("🌿 Predicted Plant:", predicted_class.capitalize())
-print("📊 Confidence:", round(confidence * 100, 2), "%")
+    print("\n📸 Image:", img_name)
+    print("📊 Confidence:", round(confidence * 100, 2), "%")
 
-print("\n💊 Medicinal / Common Uses:")
-for use in plant_info[predicted_class]["uses"]:
-    print("-", use)
+    if confidence < CONFIDENCE_THRESHOLD:
+        print("⚠️ Unknown or unsupported leaf image")
+    else:
+        print("🌿 Predicted Plant:", predicted_class.capitalize())
+        print("💊 Uses:")
+        for use in plant_info[predicted_class]["uses"]:
+           print("-", use)
+
 
