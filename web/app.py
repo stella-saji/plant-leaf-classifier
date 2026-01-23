@@ -4,22 +4,28 @@ import numpy as np
 import os
 from tensorflow.keras.preprocessing import image
 from werkzeug.utils import secure_filename
+from uuid import uuid4
 
+# -------------------- APP SETUP --------------------
 app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
+MODEL_PATH = os.path.join(BASE_DIR, "..", "plant_leaf_model.h5")
+
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
+CONFIDENCE_THRESHOLD = 0.7
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # 5 MB limit
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+# -------------------- LOAD MODEL --------------------
+model = tf.keras.models.load_model(MODEL_PATH)
 
-
-# Load model once (important!)
-model = tf.keras.models.load_model("plant_leaf_model.h5")
-
-class_names = ['mango', 'neem', 'tulsi']
-CONFIDENCE_THRESHOLD = 0.7
+class_names = ["mango", "neem", "tulsi"]
 
 plant_info = {
     "neem": [
@@ -42,6 +48,12 @@ plant_info = {
     ]
 }
 
+# -------------------- HELPERS --------------------
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+# -------------------- ROUTES --------------------
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -57,9 +69,10 @@ def predict():
     if request.method == "POST":
         file = request.files.get("image")
 
-        if file:
-            image_name = secure_filename(file.filename)
-            img_path = os.path.join(app.config["UPLOAD_FOLDER"], image_name)
+        if file and file.filename and allowed_file(file.filename):
+            safe_name = secure_filename(file.filename)
+            unique_name = f"{uuid4().hex}_{safe_name}"
+            img_path = os.path.join(app.config["UPLOAD_FOLDER"], unique_name)
             file.save(img_path)
 
             img = image.load_img(img_path, target_size=(224, 224))
@@ -76,7 +89,11 @@ def predict():
             else:
                 prediction = "Unknown or unsupported leaf"
 
-    # ✅ ALWAYS return a response (GET or POST)
+            image_name = unique_name
+
+        else:
+            prediction = "Invalid file type. Please upload a leaf image."
+
     return render_template(
         "predict.html",
         prediction=prediction,
@@ -85,5 +102,7 @@ def predict():
         image_name=image_name
     )
 
+
+# -------------------- RUN --------------------
 if __name__ == "__main__":
     app.run(debug=True)
