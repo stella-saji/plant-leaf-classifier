@@ -2,23 +2,15 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing import image
 import os
+
 CONFIDENCE_THRESHOLD = 0.7  # 70%
 
-# 1. Load the trained model
-model = tf.keras.models.load_model("plant_leaf_model.h5")
+# 1. Load the trained model (SavedModel format)
+model = tf.keras.models.load_model("plant_leaf_model")
 
 # 2. Class names (IMPORTANT: order matters)
 class_names = ['mango', 'neem', 'tulsi']
 
-# 3. Load and preprocess the image
-img_path = "test_images/test_leaf.jpg"
-
-img = image.load_img(img_path, target_size=(224, 224))
-img_array = image.img_to_array(img)
-img_array = img_array / 255.0
-img_array = np.expand_dims(img_array, axis=0)
-
-# 4. Make prediction
 # Medicinal / use information
 plant_info = {
     "neem": {
@@ -62,21 +54,35 @@ for img_name in image_files:
     img_array = np.expand_dims(img_array, axis=0)
 
     predictions = model.predict(img_array)
-    confidence = np.max(predictions)
-    predicted_class = class_names[np.argmax(predictions)]
-
     
+    # Get top prediction and confidence
+    confidence = np.max(predictions[0])
+    predicted_class = class_names[np.argmax(predictions[0])]
+    
+    # Get all predictions for display
+    all_preds = predictions[0]
 
-# 5. Output result
-    print("\n📸 Image:", img_name)
-    print("📊 Confidence:", round(confidence * 100, 2), "%")
+    print("\n" + "="*60)
+    print(f"📸 Image: {img_name}")
+    print("="*60)
+    
+    # Show confidence scores for all classes
+    print("📊 Confidence Scores:")
+    for i, class_name in enumerate(class_names):
+        score = all_preds[i]
+        bar = "█" * int(score * 30)  # Visual bar
+        print(f"  {class_name.capitalize():10} {score*100:6.2f}% {bar}")
+    
+    print(f"\n🔝 Top Prediction: {predicted_class.capitalize()} ({confidence*100:.2f}%)")
 
     if confidence < CONFIDENCE_THRESHOLD:
-        print("⚠️ Unknown or unsupported leaf image")
+        print("⚠️  Confidence below threshold - May be an unknown/unsupported leaf")
     else:
-        print("🌿 Predicted Plant:", predicted_class.capitalize())
-        print("💊 Uses:")
+        print("✅ High confidence prediction!")
+        print("\n💊 Uses & Benefits:")
         for use in plant_info[predicted_class]["uses"]:
-           print("-", use)
+           print(f"  • {use}")
+
+print("\n" + "="*60)
 
 

@@ -1,0 +1,107 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Flask
+instance/
+.webassets-cache
+*.log
+flask.log
+app.log
+
+# Sensitive Information
+.env
+.env.local
+.env.*.local
+config/secrets.json
+secrets.json
+credentials.json
+*.key
+*.pem
+*.p12
+*.pfx
+private_key.json
+api_keys.json
+oauth_token.json
+.aws/
+.credentials
+.ssh/
+
+# Model files (optional - uncomment if storing locally)
+# plant_leaf_model/
+
+# Uploads (temp files)
+web/static/uploads/*
+!web/static/uploads/.gitkeep
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Test & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Dataset (if large, uncomment)
+# dataset/
+
+# Deployment
+*.pem
+*.key
+deploy_key*
+
+# Editor
+*.bak
+*~
+.*.swp
+.env.swp
+

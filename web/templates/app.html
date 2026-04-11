@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 Plant Leaf Classifier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            font-family: "Segoe UI", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            max-width: 500px;
+            width: 100%;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            animation: fadeIn 0.8s ease;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            color: #2e7d32;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .author {
+            text-align: center;
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .features {
+            text-align: left;
+            margin: 30px 0;
+            list-style: none;
+        }
+
+        .features li {
+            margin: 12px 0;
+            font-size: 16px;
+        }
+
+        .upload-box {
+            border: 2px dashed #81c784;
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            transition: background 0.3s, border-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-box:hover {
+            background: #f1f8e9;
+            border-color: #4caf50;
+        }
+
+        input[type="file"] {
+            display: block;
+            margin: 15px auto 0;
+        }
+
+        button, a.btn {
+            display: inline-block;
+            width: 100%;
+            padding: 14px 40px;
+            background: #4caf50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        button:hover, a.btn:hover {
+            background: #43a047;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+        }
+
+        .secondary {
+            background: #9e9e9e;
+            margin-top: 15px;
+        }
+
+        .secondary:hover {
+            background: #757575;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #f9fbe7;
+            animation: slideUp 0.5s ease;
+        }
+
+        .result p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .result strong {
+            color: #2e7d32;
+        }
+
+        .confidence {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #558b2f;
+        }
+
+        .result h4 {
+            margin-top: 15px;
+            color: #2e7d32;
+        }
+
+        .result ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        .result li {
+            margin: 8px 0;
+        }
+
+        .confidence-bars {
+            margin: 20px 0;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .bar-title {
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .bar-item {
+            margin-bottom: 12px;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 6px;
+            min-width: 2%;
+        }
+
+        .bar-fill.mango {
+            background: linear-gradient(90deg, #ff9800, #ffc107);
+        }
+
+        .bar-fill.neem {
+            background: linear-gradient(90deg, #4caf50, #81c784);
+        }
+
+        .bar-fill.tulsi {
+            background: linear-gradient(90deg, #9c27b0, #ba68c8);
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideDown 0.4s ease;
+            font-size: 15px;
+        }
+
+        .alert.error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+
+        .alert.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+
+        img {
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 12px;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        img:hover {
+            transform: scale(1.02);
+        }
+
+        .center-btn {
+            text-align: center;
+        }
+
+        .center-btn a {
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            button, a.btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            .result {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if not show_predict %}
+            <h1>🌿 Leaf Classifier</h1>
+            <div class="author">- by <strong>Stella Saji</strong></div>
+
+            <ul class="features">
+                <li>🍃 Classifies leaf images using AI</li>
+                <li>🌱 Detects <strong>Mango, Neem, Tulsi</strong></li>
+                <li>❓ Handles unknown or non-leaf images</li>
+                <li>📊 Shows confidence for every prediction</li>
+            </ul>
+
+            <div class="center-btn">
+                <form action="/predict" method="get" style="display: inline-block; width: auto;">
+                    <button type="submit">Get Started -></button>
+                </form>
+            </div>
+        {% else %}
+            <h1>🌿 Plant Leaf Classifier</h1>
+
+            {% if not prediction %}
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="upload-box">
+                        <p>📸 Upload a leaf image</p>
+                        <input type="file" name="image" accept="image/*" required>
+                    </div>
+                    <button type="submit">Predict</button>
+                </form>
+            {% else %}
+                <div class="result">
+                    {% if prediction != "Unknown or unsupported leaf" %}
+                        <h2>🌿 {{ prediction }}</h2>
+                        <p><strong>Prediction:</strong> {{ prediction }}</p>
+                    {% else %}
+                        <h2>Unknown Leaf</h2>
+                        <p><strong>Prediction:</strong> {{ prediction }}</p>
+                    {% endif %}
+
+                    {% if confidence %}
+                        <p class="confidence">
+                            Top Confidence: {{ (confidence * 100) | round(2) }}%
+                        </p>
+                    {% endif %}
+
+                    {% if all_confidences %}
+                        <div class="confidence-bars">
+                            <div class="bar-title">📊 Model Confidence Scores</div>
+                            {% for item in all_confidences %}
+                                <div class="bar-item">
+                                    <div class="bar-label">
+                                        <span>{{ item.class }}</span>
+                                        <span>{{ (item.score * 100) | round(1) }}%</span>
+                                    </div>
+                                    <div class="bar-container">
+                                        <div class="bar-fill {{ item.class.lower() }}" style="width: {{ (item.score * 100) | round(1) }}%"></div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if uses and prediction != "Unknown or unsupported leaf" %}
+                        <h4>💊 Uses & Benefits</h4>
+                        <ul>
+                            {% for use in uses %}
+                                <li>{{ use }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if image_name %}
+                        <img src="{{ url_for('static', filename='uploads/' + image_name) }}" alt="Uploaded leaf image">
+                    {% endif %}
+                </div>
+
+                <a href="/predict" class="btn secondary">Predict Another Leaf</a>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+
+</html>
